@@ -1,0 +1,8 @@
+{
+    "dev": {
+        "driver": "mysql",
+        "user": "user",
+        "password": "password",
+        "database":"db"
+    }
+ } 
