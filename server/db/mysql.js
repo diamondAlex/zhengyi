@@ -10,6 +10,9 @@ const connection = mysql.createConnection({
 
 module.exports =  (conn = connection) => {
     return {
+        "close": () =>{
+            conn.end()
+        },
         //this is probably better off elsewhere, or just part of getUser
         "getPassword": (username) => {
             return new Promise((resolve,reject) => {
@@ -98,9 +101,23 @@ module.exports =  (conn = connection) => {
                 })
             })
         },
+        "getArticleCount": (from, to) => {
+            let qry = `select count(*) as count from articles`
+            return new Promise((resolve, reject) => {
+                conn.query(qry, (err,values) => {
+                    if(err){
+                        reject(err)
+                    }
+                    else{
+                        resolve(values)
+                    }
+                })
+            })
+    
+        },
         "getArticles": (from, to) => {
             let qry = `select 
-            articleId,author,title,date,text,preview
+            articleId,author,title,date,text
             from articles where id between ${from} and ${to}`
             return new Promise((resolve, reject) => {
                 conn.query(qry, (err,values) => {
@@ -116,7 +133,7 @@ module.exports =  (conn = connection) => {
         },
         "getArticle": (articleId) => {
             let qry = `select 
-            articleId,author,title,date,text,preview
+            articleId,author,title,date,text,
             from articles where articleId = ${articleId}`
             return new Promise((resolve, reject) => {
                 conn.query(qry, (err,values) => {
@@ -132,19 +149,19 @@ module.exports =  (conn = connection) => {
         },
         "setArticle": (values = {}) => {
             let qry = `insert into 
-                articles(articleId, author,title,date,text,preview)
+                articles(articleId, author,title,date,text)
                 values( 
                     ${values.articleId},
                     "${values.author}",
                     "${values.title}",
                     "${values.date}",
-                    "${values.text}",
-                    "${values.preview}"
+                    "${values.text}"
                 )`
             return new Promise((resolve, reject) => {
                 conn.query(qry, (err) => {
                     if(err){
                         reject(err)
+                        console.log(err)
                     }
                     else{
                         resolve('worked')

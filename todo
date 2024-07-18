@@ -1,0 +1,8 @@
+allow user to edit profile page
+fix the article navigation at the bottom of page (should have go to first/last, should not be longer than the max amount of article (if theres like 20 articles, allow navigation to like 2 pages, not 1 to 10 by default))
+create ad space!
+setup comments on articles
+make a nav bar and stub pages
+set up socials for writers
+set up lightmode/darkmode proper
+add a message that say something along the lines of "Here at the zhengyi, we keep track of all of your information, which shouldn't be an issue if you have nothing to hide"

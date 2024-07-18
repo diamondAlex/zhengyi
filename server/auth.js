@@ -5,7 +5,7 @@ let sessions = []
 
 let getUserFromSession = (req) => {
     let cookie = req.headers['cookie']
-    let sessionId = extractSession(cookie)
+    let sessionId = extractSessionId(cookie)
     return sessions.find((val) => val.sessionId == sessionId).username
 }
 
@@ -25,7 +25,7 @@ let getSessions = () => {
 }
 
 let removeSession = (cookie) =>{
-    let sessionId = extractSession(cookie)
+    let sessionId = extractSessionId(cookie)
     let index = sessions.findIndex((val) => val.sessionId == sessionId)
     sessions.splice(index,1)
 }
@@ -33,12 +33,12 @@ let removeSession = (cookie) =>{
 //TODO NEED TO TEST THIS. VERY SUSPICIOUS!!! WORKED DESPITE HAVING A BUG!!
 let isLoggedIn = (req) => {
     let cookie = req.headers['cookie']
-    let sessionId = extractSession(cookie)
+    let sessionId = extractSessionId(cookie)
     let found = sessions.find((val) => val.sessionId == sessionId) ? true: false;
     return found
 }
 
-let extractSession = (cookie) => {
+let extractSessionId = (cookie) => {
     if(!cookie) return ""
 
     let info = cookie.split(";")
@@ -57,7 +57,7 @@ let isAdmin = async (req,res) =>{
         return 0
     }
     let cookie = req.headers['cookie']
-    let sessionId = extractSession(cookie)
+    let sessionId = extractSessionId(cookie)
     let username = sessions.find((val) => val.sessionId == sessionId).username
 
     if(!username){

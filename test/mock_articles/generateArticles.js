@@ -31,7 +31,6 @@ let generateArticle = () => {
         "title" : 'title',
         "date" : new Date().toISOString().split("T")[0],
         "text" : "'TESTTTT'",
-        "preview" : "'TEST'"
     }
 
     db.setArticle(data)

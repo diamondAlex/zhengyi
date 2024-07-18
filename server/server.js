@@ -57,7 +57,6 @@ let getHtml = (page, res) =>{
         //temporary until I set up something for other images
         else if(page.includes('png')){
             filePath = `public${page}`
-            console.log(filePath)
             file = fs.readFileSync(filePath)
         }
         else{

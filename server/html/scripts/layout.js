@@ -1,3 +1,7 @@
+const SHOWN_ARTICLE = 10
+const PREVIEW_SIZE = 350
+let count = 0
+
 let articles = []
 let mode = 'lightmode'
 
@@ -5,8 +9,32 @@ function setBanner(){
     let div = document.getElementById("header")
     div.style= `background-image: url('${mode}.png')`
 }
-
 setBanner()
+
+//display menu bar
+function setMenu(){
+    let div = document.getElementById("menu")
+
+    let menuTabs = [
+        "articles",
+        "stations",
+        "writers",
+        "contact"
+    ]
+
+    let i = 1
+    for(item of menuTabs){
+        let ref = document.createElement("a")
+        ref.innerHTML = item + "<br/>"
+        ref.id = "menu"+i
+        ref.className = "menuitem"
+        ref.href = "/test"
+        div.appendChild(ref)
+        i++
+    }
+
+}
+setMenu()
 
 //Makes the header image link to 1st page
 function homeLinkEventListener(){
@@ -19,11 +47,11 @@ function homeLinkEventListener(){
 }
 homeLinkEventListener()
 
-
 //this function is ran on page load and routes to 1st page (new login)
 //or to current page (refresh)
 function entry(){
     let url = new URL(window.location.href)
+    fetchArticleCount()
     if(url.pathname.includes("article")){
         let id = url.pathname.split("/")[2]
         getArticle(id) 
@@ -34,6 +62,16 @@ function entry(){
     else{
         navigation.navigate(url.href)
     }
+}
+
+function fetchArticleCount(){
+    fetch(`http://localhost:8080/articlecount.api`, {
+        method:"GET",
+    }).then((ret) =>{
+        ret.json().then((json) => {
+            count = json.count
+        })
+    })
 }
 
 function setEditor(){
@@ -86,7 +124,7 @@ function getArticles(newPage = null){
     let params = new URLSearchParams(window.location.search)
     let page = newPage ? newPage : params.get('page') ? params.get('page') : 1
 
-    fetch(`http://localhost:8080/articles.api?page=${page}`)
+    fetch(`http://localhost:8080/articles.api?page=${page}&count=${SHOWN_ARTICLE}`)
         .then((response) => response.json())
         .then((json) => {
             articles = json
@@ -154,10 +192,10 @@ function footer(){
     element.id = "footer"
 
     let page = 1
-    let shown = 7
-    let spread = Math.floor(shown/2)
+    let spread = 10
+    let total_pages = Math.ceil(count / SHOWN_ARTICLE)
+    console.log(total_pages)
 
-    //getting the page, wow, beautiful
     try{
         page = parseInt(new URL(window.location.href).search.split('=')[1])
     }
@@ -166,7 +204,7 @@ function footer(){
     }
 
     let min = page - spread >= 1 ? page - spread : 1
-    let max = min + shown
+    let max = total_pages > spread ? min + SHOWN_ARTICLE: total_pages
 
     let left = document.createElement("a")
     left.innerHTML = '<a> < </a>' 
@@ -178,12 +216,16 @@ function footer(){
     })
     element.appendChild(left)
 
-    for(let i=min;i<max;i++){
+    for(let i=min;i<=max;i++){
         let ref = document.createElement("a")
         ref.innerHTML = `<a> ${i} </a>` 
+        ref.id = "page" + i
         ref.addEventListener("click", () =>{
             navigation.navigate('/?page=' + i)
         })
+        if(i == page){
+            ref.style.fontWeight = "bold"
+        }
         element.appendChild(ref)
     }
     
@@ -192,10 +234,11 @@ function footer(){
     right.addEventListener("click", () =>{
         let currentPage = parseInt(document.URL.split("=")[1])
         //TODO: try to make the arrow stop at last page
-        if(currentPage + 1 <= 10){
+        if(currentPage + 1 <= 10 && currentPage + 1 <= max){
             navigation.navigate('/?page=' + (currentPage + 1))
         }
     })
+
     element.appendChild(right)
 
     div.appendChild(element)
@@ -221,21 +264,27 @@ function setArticles(){
         articleInfo.innerHTML= articleHeaderText
         articleInfo.id = "info"
 
-        let preview = document.createElement("p")
-        preview.innerHTML = article.preview
+        let preview = document.createElement("div")
+        preview.id = "preview"
+        preview.className = "preview"
+        preview.innerHTML = article.text.substring(0,PREVIEW_SIZE)
+        preview.innerHTML = preview.innerHTML + "...</br>"
+
 
         let href = document.createElement("a")
-        href.innerHTML= "read more <br/>"
+        href.innerHTML= "<br/> read more <br/>"
         href.id = article.articleId
         href.href = "/article/" + article.articleId 
 
         let underline = document.createElement("p")
-        underline.innerHTML = "_____________________________________"
+        underline.innerHTML = `<br/> 
+            __________________________________________________________________________ 
+            <br/><br/>`
 
         articleDiv.appendChild(title)
         articleDiv.appendChild(articleInfo)
         articleDiv.appendChild(preview)
-        articleDiv.appendChild(href)
+        preview.appendChild(href)
         articleDiv.appendChild(underline)
         div.appendChild(articleDiv)
     } 

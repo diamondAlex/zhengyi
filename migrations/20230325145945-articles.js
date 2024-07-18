@@ -21,8 +21,7 @@ exports.up = function(db) {
         author: 'string',
         title: 'string',
         date: 'date',
-        text: 'text',
-        preview: 'text'
+        text: 'text'
     });
     return null;
 };

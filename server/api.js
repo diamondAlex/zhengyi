@@ -65,11 +65,11 @@ module.exports = {
     //amount returned, cause the ID is auto increment.
     "articles": async({input, res} = {}) => {
         //max articles per page
-        const max = 3
         let page = input.get('page')
+        let count = input.get('count')
 
-        let from =  page * max
-        let to = page * max + max 
+        let from =  (page - 1)* count
+        let to = page * count 
 
         let data = await db.getArticles(from,to)
         res.write(JSON.stringify(data))
@@ -79,6 +79,12 @@ module.exports = {
         let articleId = input.get('id')
         let data = await db.getArticle(articleId)
         res.write(JSON.stringify(data))
+        res.end()
+    },
+    "articlecount": async({input, res} = {}) => {
+        let data = await db.getArticleCount()
+        let count = data[0]['count']
+        res.write(JSON.stringify({count:count}))
         res.end()
     },
     "editor": async({input,res} = {}) =>{
